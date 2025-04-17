@@ -13,5 +13,42 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="AshEngine">
+      <UniqueIdentifier>{c2dec753-6661-4e96-9b40-3161f2895def}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshAnimator.cpp">
+      <Filter>AshEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshCore.cpp">
+      <Filter>AshEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshEntity.cpp">
+      <Filter>AshEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshResourceManager.cpp">
+      <Filter>AshEngine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshAnimator.h">
+      <Filter>AshEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshCore.h">
+      <Filter>AshEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshEngine.h">
+      <Filter>AshEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshEntity.h">
+      <Filter>AshEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshResourceManager.h">
+      <Filter>AshEngine</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
