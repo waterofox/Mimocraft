@@ -16,6 +16,9 @@
     <Filter Include="AshEngine">
       <UniqueIdentifier>{c2dec753-6661-4e96-9b40-3161f2895def}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scenes&amp;properties">
+      <UniqueIdentifier>{6f0544b1-0cc8-447c-a78b-40150a93f1c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -32,6 +35,9 @@
     </ClCompile>
     <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshResourceManager.cpp">
       <Filter>AshEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,5 +56,25 @@
     <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshResourceManager.h">
       <Filter>AshEngine</Filter>
     </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\mimocraftScripts.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\mimocraftSlots&amp;Signals.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\blocks.h">
+      <Filter>scenes&amp;properties</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\properties.txt">
+      <Filter>scenes&amp;properties</Filter>
+    </Text>
+    <Text Include="resources\scenes\playerArea.txt">
+      <Filter>scenes&amp;properties</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -134,6 +134,7 @@
     <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshCore.cpp" />
     <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshEntity.cpp" />
     <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshResourceManager.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +143,14 @@
     <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshEngine.h" />
     <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshEntity.h" />
     <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshResourceManager.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="scripts\blocks.h" />
+    <ClInclude Include="scripts\mimocraftScripts.h" />
+    <ClInclude Include="scripts\mimocraftSlots&amp;Signals.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\properties.txt" />
+    <Text Include="resources\scenes\playerArea.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
