@@ -3,6 +3,27 @@
 
 #include "Game.h"
 
+void Game::init()
+{
+	player.setPosition(0, 0);
+
+	//texturing
+	player.setTexturePath("sq.png");
+	AshResourceManager::textureSettings settings;
+	settings.sRgb = false; settings.repeated = true, settings.smooth = false;
+	this->getResourceManager().addTexture("sq.png", settings);
+	player.setTextureRect(sf::IntRect(0, 0, 64, 80));
+	player.setScale(1, 1);
+
+	player.setName("player");
+
+	this->pushEntity(player,0);
+
+	this->addScript("playerArea", "player", playerScript);
+
+	this->setEventHandlingFunction(playerInput);
+}
+
 int Game::blockTypeParser(const std::string& type)
 {
 	if (type == "-1") { return Blocks::void_b; }
@@ -47,4 +68,9 @@ std::vector<BlockInfo> Game::chunkParser(const std::string& chunk)
 		}
 	}
 	return resualt;
+}
+
+std::vector<BlockInfo> Game::chunkGenerator(const std::string& chunk)
+{
+	return std::vector<BlockInfo>();
 }

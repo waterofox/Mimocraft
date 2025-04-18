@@ -18,7 +18,13 @@ private:
 	AshEntity player;
 	std::string chunkDir = "data/cnunks/";
 public:
-	Game() : AshCore(1000, 1000, 120, "Mimocraft") { loadScene("playerArea.txt"); }
+
+
+	Game() : AshCore(1000, 1000, 120, "Mimocraft") { loadScene("playerArea.txt"); init(); }
+
+	void init();
+
+	//void areaBuilder();
 
 	//Parsers
 	int blockTypeParser(const std::string& type);

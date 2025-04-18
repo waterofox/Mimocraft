@@ -1,5 +1,5 @@
 #pragma once
-enum Blocks
+static enum Blocks
 {
 	void_b = -1,
 	grass = 0,
