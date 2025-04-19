@@ -16,7 +16,9 @@ class Game : public AshCore
 {
 private:
 	AshEntity player;
-	std::string chunkDir = "data/cnunks/";
+	int playerLay = 0;
+	sf::Vector2f playerPositionInWorld;
+	std::string chunkDir = "data/chunks/";
 public:
 
 
@@ -24,11 +26,13 @@ public:
 
 	void init();
 
-	//void areaBuilder();
+	void areaBuilder();
 
 	//Parsers
 	int blockTypeParser(const std::string& type);
-	sf::Vector2f rotate(const sf::Vector2f& cords);
+	sf::Vector2f rotateIN(const sf::Vector2f& cords);
+	sf::Vector2f rotateOUT(const sf::Vector2f& cords);
+	int myMod(const int& a, const int& b){return (a % b + b) % b;}
 
 	std::vector<BlockInfo> chunkParser(const std::string& chunk);
 	std::vector<BlockInfo> chunkGenerator(const std::string& chunk);
