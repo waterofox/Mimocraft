@@ -1,5 +1,4 @@
 #define chunkSize 6
-#define PI 3.1415926535
 
 #include "Game.h"
 
@@ -10,22 +9,23 @@ std::vector<std::string> blocksTextures = {
 void Game::init()
 {
 
-	player.addProperty(ash::p_float, "world_x", 0);
-	player.addProperty(ash::p_float, "world_y", 0);
-	player.addProperty(ash::p_float, "world_z", 0);
+	player.addProperty(ash::p_float, "world_x", 5);
+	player.addProperty(ash::p_float, "world_y", 5);
+	player.addProperty(ash::p_float, "world_z", 1);
+	player.addProperty(ash::p_bool, "updated", false);
 
 	player.setTexturePath("player.png");
-	//AshResourceManager::textureSettings settings;
-	//settings.sRgb = false; settings.repeated = true, settings.smooth = false;
-	//this->getResourceManager().addTexture("sq.png", settings);
+
 	player.setTextureRect(sf::IntRect(0, 0, 64, 64));
 	player.setScale(1.5,1.5);
 
 	player.setName("player");
-	this->pushEntity(player,0);
+	this->pushEntity(player,11);
 	this->addScript("playerArea", "player", playerScript);
 
 	this->setEventHandlingFunction(playerInput);
+
+	this->addSlot("playerArea", signals::detonate_player, slot_to_detonate_player);
 
 	areaBuilder();
 }
@@ -37,6 +37,7 @@ void Game::areaBuilder()
 	std::string chunkName = std::to_string(int(realPLayerPos.x / chunkSize)) + "_" + std::to_string(int(realPLayerPos.y / chunkSize));
 	std::vector<BlockInfo> chunkData = chunkParser(chunkName + ".txt");
 
+	
 	for (int i = 0; i < chunkData.size(); ++i)
 	{
 		BlockInfo& block = chunkData[i];
@@ -55,7 +56,7 @@ void Game::areaBuilder()
 		blockEntity.setVisible(true);
 		blockEntity.setColliding(false);
 
-		this->pushEntity(blockEntity, block.z);
+		this->pushEntity(blockEntity, block.x + block.y + block.z);
 		
 	}
 	std::cout << "fin";
@@ -71,24 +72,6 @@ int Game::blockTypeParser(const std::string& type)
 	if (type == "04") { return Blocks::cobble_stone; }
 	if (type == "05") { return Blocks::water; }
 	if (type == "06") { return Blocks::glass; }
-}
-
-sf::Vector2f Game::rotateIN(const sf::Vector2f& cords)
-{
-	double radians = 45 * PI / 180;
-	sf::Vector2f newPosition;
-	newPosition.x = cos(radians) * cords.x - sin(radians) * cords.y;
-	newPosition.y = sin(radians) * cords.x + cos(radians) * cords.y;
-	return newPosition;
-}
-
-sf::Vector2f Game::rotateOUT(const sf::Vector2f& cords)
-{
-	double radians = -45 * PI / 180;
-	sf::Vector2f newPosition;
-	newPosition.x = cos(radians) * cords.x - sin(radians) * cords.y;
-	newPosition.y = sin(radians) * cords.x + cos(radians) * cords.y;
-	return newPosition;
 }
 
 std::vector<BlockInfo> Game::chunkParser(const std::string& chunk)
@@ -118,6 +101,7 @@ std::vector<BlockInfo> Game::chunkParser(const std::string& chunk)
 		}
 	}
 	return resualt;
+	
 }
 
 std::vector<BlockInfo> Game::chunkGenerator(const std::string& chunk)
