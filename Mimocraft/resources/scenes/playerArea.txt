@@ -1,2 +1,2 @@
 scene_name: playerArea
-camera_type: static camera_fullscreen: true camera_x: 0 camera_y: 0 camera_width: 100 camera_height: 100
+camera_type: dynamic camera_fullscreen: true camera_x: 0 camera_y: 0 camera_width: 100 camera_height: 100

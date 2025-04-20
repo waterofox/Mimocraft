@@ -14,12 +14,12 @@ void Game::init()
 	player.addProperty(ash::p_float, "world_y", 0);
 	player.addProperty(ash::p_float, "world_z", 0);
 
-	player.setTexturePath("sq.png");
-	AshResourceManager::textureSettings settings;
-	settings.sRgb = false; settings.repeated = true, settings.smooth = false;
-	this->getResourceManager().addTexture("sq.png", settings);
-	player.setTextureRect(sf::IntRect(0, 0, 64, 80));
-	player.setScale(1, 1);
+	player.setTexturePath("player.png");
+	//AshResourceManager::textureSettings settings;
+	//settings.sRgb = false; settings.repeated = true, settings.smooth = false;
+	//this->getResourceManager().addTexture("sq.png", settings);
+	player.setTextureRect(sf::IntRect(0, 0, 64, 64));
+	player.setScale(1.5,1.5);
 
 	player.setName("player");
 	this->pushEntity(player,0);
