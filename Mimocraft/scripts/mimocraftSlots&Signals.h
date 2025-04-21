@@ -13,5 +13,4 @@ static void slot_to_detonate_player(AshCore* theCore, AshEntity& oldPLayer)
 	theCore->popEntity("player", int(oldPLayer.getFloat("world_x")) + int(oldPLayer.getFloat("world_y")) + int(oldPLayer.getFloat("world_z")));
 	AshEntity& newPlayer = theCore->getEntity("player");
 	newPlayer.setTexture(theCore->getResourceManager().getTexture("player.png"));
-	std::cout << "delere";
 }

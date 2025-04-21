@@ -8,6 +8,8 @@ std::vector<std::string> blocksTextures = {
 
 void Game::init()
 {
+	
+	this->getWindow().setKeyRepeatEnabled(false);
 
 	player.addProperty(ash::p_float, "world_x", 5);
 	player.addProperty(ash::p_float, "world_y", 5);

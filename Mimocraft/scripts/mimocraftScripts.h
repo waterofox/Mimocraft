@@ -61,6 +61,9 @@ static void playerInput(AshCore& theCore)
 
 static void playerScript(AshCore* theCore, AshEntity& player)
 {
+
+	if (player.getBool("updated")) { player.getBool("updated") = false; return; }
+
 	float x = player.getFloat("world_x");
 	float y = player.getFloat("world_y");
 	
@@ -90,7 +93,12 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 	if (int(temp.x) != int(x) or int(temp.y) != int(y))
 	{
 		AshEntity PlayerTwo = player;
-		theCore->pushEntity(PlayerTwo, int(player.getFloat("world_z")) + int(temp.x) + int(temp.y));
+		int newLay = int(player.getFloat("world_z")) + int(temp.x) + int(temp.y);
+		int oldLay = int(x) + int(y) + int(player.getFloat("world_z"));
+
+		if (newLay > oldLay) { PlayerTwo.getBool("updated") = true; }
+
+		theCore->pushEntity(PlayerTwo, newLay);
 		player.getFloat("world_x") = x;
 		player.getFloat("world_y") = y;
 		theCore->emitSignal(detonate_player, player);
