@@ -11,8 +11,8 @@ void Game::init()
 	
 	this->getWindow().setKeyRepeatEnabled(false);
 
-	player.addProperty(ash::p_float, "world_x", 5);
-	player.addProperty(ash::p_float, "world_y", 5);
+	player.addProperty(ash::p_float, "world_x", 0);
+	player.addProperty(ash::p_float, "world_y", 6);
 	player.addProperty(ash::p_float, "world_z", 1);
 	player.addProperty(ash::p_bool, "updated", false);
 
@@ -22,7 +22,7 @@ void Game::init()
 	player.setScale(1.5,1.5);
 
 	player.setName("player");
-	this->pushEntity(player,11);
+	this->pushEntity(player,int(player.getFloat("world_x") + int(player.getFloat("world_y") + int(player.getFloat("world_z")))));
 	this->addScript("playerArea", "player", playerScript);
 
 	this->setEventHandlingFunction(playerInput);
@@ -48,7 +48,7 @@ void Game::areaBuilder()
 		sf::Vector2f blockPosition(block.x, block.y);
 		blockPosition *= float((64 * 0.70));
 		blockEntity.setPosition(rotateIN(blockPosition));
-		blockEntity.move(0,-(32*block.z + 16 * myMod(block.x,chunkSize) + 16*myMod(block.y,chunkSize)));
+		blockEntity.move(0,-(32*block.z + 16 * block.x + 16*block.y));
 
 		blockEntity.setName(std::to_string(block.x) + ' ' + std::to_string(block.y) + ' ' + std::to_string(block.z));
 
@@ -61,7 +61,6 @@ void Game::areaBuilder()
 		this->pushEntity(blockEntity, block.x + block.y + block.z);
 		
 	}
-	std::cout << "fin";
 }
 
 int Game::blockTypeParser(const std::string& type)
@@ -102,11 +101,28 @@ std::vector<BlockInfo> Game::chunkParser(const std::string& chunk)
 			resualt.push_back(newBLock);
 		}
 	}
+	chunk_f.close();
 	return resualt;
 	
 }
 
 std::vector<BlockInfo> Game::chunkGenerator(const std::string& chunk)
 {
-	return std::vector<BlockInfo>();
+	//сейчас просто платформу создаю
+
+	int x = std::stoi(chunk.substr(0, chunk.find('_')));
+	int y = std::stoi(chunk.substr(chunk.find('_') + 1, chunk.length() - chunk.find('_')));
+
+	std::ofstream newChunk(chunkDir + chunk);
+	newChunk << "1\n";
+	for (int i = 0 + y*chunkSize; i < 6 + y * chunkSize; ++i)
+	{
+		for (int j = 0 + x * chunkSize; j < 6 + x*chunkSize; ++j)
+		{
+			newChunk << "00 " << j << ' ' << i << ' ' << '0' << "  ";
+		}
+		newChunk << '\n';
+	}
+	newChunk.close();
+	return chunkParser(chunk);
 }

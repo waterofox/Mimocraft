@@ -26,27 +26,30 @@ static sf::Vector2f rotateOUT(const sf::Vector2f& cords)
 static int myMod(const int& a, const int& b) { return (a % b + b) % b; }
 
 
-static void keyBoardChecker(AshCore& theCore, const sf::Keyboard::Key& key, const bool& move)
+static void keyBoardChecker(AshCore& theCore, const sf::Keyboard::Key& key,const  bool& move)
 {
 	AshEntity& player = theCore.getEntity("player");
 	switch (key)
 	{
 	case sf::Keyboard::Key::W: {player.moveUp = move; } break;
-	case sf::Keyboard::Key::D: {
-		player.moveRight = move; } 
-							 break;
+	case sf::Keyboard::Key::D: {player.moveRight = move; } break;
 	case sf::Keyboard::Key::S: {player.moveDown = move; } break;
 	case sf::Keyboard::Key::A: {player.moveLeft = move; } break;
 	default:
 		break;
 	}
+	//AshEntity& player = theCore.getEntity("player");
+	player.moveDown = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+	player.moveUp = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
+	player.moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
+	player.moveLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
 }
 
 static void playerInput(AshCore& theCore)
 {
 	sf::Event& event = theCore.getActualEvent();
 	sf::RenderWindow& window = theCore.getWindow();
-	if (window.pollEvent(event))
+	while (window.pollEvent(event))
 	{
 		switch (event.type)
 		{
@@ -56,6 +59,7 @@ static void playerInput(AshCore& theCore)
 		default:
 			break;
 		}
+
 	}
 }
 
@@ -69,12 +73,14 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 	
 	sf::Vector2f actual(x, y);
 
+
 	if (player.moveUp) { actual.y -= playerSpeed * deltaTime; }
-	if (player.moveDown) { 
-		actual.y += playerSpeed * deltaTime; }
+	if (player.moveDown) { actual.y += playerSpeed * deltaTime; }
 
 	if (player.moveLeft) { actual.x -= playerSpeed * deltaTime; }
 	if (player.moveRight) { actual.x += playerSpeed * deltaTime; }
+
+	
 
 	if (actual.x < 0 or actual.y < 0) { return; }
 
@@ -90,7 +96,7 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 	player.move(0, -16*player.getFloat("world_y"));
 	player.move(0, -16 * player.getFloat("world_x"));
 	
-	if (int(temp.x) != int(x) or int(temp.y) != int(y))
+	if (int(temp.x) + int(temp.y) != int(x) + int(y))
 	{
 		AshEntity PlayerTwo = player;
 		int newLay = int(player.getFloat("world_z")) + int(temp.x) + int(temp.y);
