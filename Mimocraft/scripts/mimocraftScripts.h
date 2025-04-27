@@ -1,29 +1,12 @@
 #pragma once
 #include "../AshEngine-Alpha-2-AP25/AshEngine/AshEngine.h"
 #include "mimocraftSlots&Signals.h"
+#include "blocks.h"
 #define playerSpeed 5
 #define deltaTime theCore->getDeltaTime().asSeconds() 
-#define PI 3.1415926535
+#define chunkSize 6
 
 using namespace ash;
-
-static sf::Vector2f rotateIN(const sf::Vector2f& cords)
-{
-	double radians = 45 * PI / 180;
-	sf::Vector2f newPosition;
-	newPosition.x = cos(radians) * cords.x - sin(radians) * cords.y;
-	newPosition.y = sin(radians) * cords.x + cos(radians) * cords.y;
-	return newPosition;
-}
-static sf::Vector2f rotateOUT(const sf::Vector2f& cords)
-{
-	double radians = -45 * PI / 180;
-	sf::Vector2f newPosition;
-	newPosition.x = cos(radians) * cords.x - sin(radians) * cords.y;
-	newPosition.y = sin(radians) * cords.x + cos(radians) * cords.y;
-	return newPosition;
-}
-static int myMod(const int& a, const int& b) { return (a % b + b) % b; }
 
 
 static void keyBoardChecker(AshCore& theCore, const sf::Keyboard::Key& key,const  bool& move)
@@ -88,6 +71,17 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 	player.getFloat("world_y") = actual.y;
 	sf::Vector2f temp = actual;
 
+	sf::Vector2i actualChunk;
+	actualChunk.x = int(actual.x / chunkSize);
+	actualChunk.y = int(actual.y / chunkSize);
+	if (actualChunk.x != player.getInt("pre_chunk_x") or actualChunk.y != player.getInt("pre_chunk_y"))
+	{
+		player.getInt("pre_chunk_x") = actualChunk.x;
+		player.getInt("pre_chunk_y") = actualChunk.y;
+		theCore->emitSignal(rebuild_area, player);
+	}
+
+
 	actual *= float((64 * 0.70));
 
 	player.setPosition(rotateIN(actual));
@@ -95,6 +89,7 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 	player.move(0, -(32.0*1.5) * player.getFloat("world_z"));
 	player.move(0, -16*player.getFloat("world_y"));
 	player.move(0, -16 * player.getFloat("world_x"));
+
 	
 	if (int(temp.x) + int(temp.y) != int(x) + int(y))
 	{

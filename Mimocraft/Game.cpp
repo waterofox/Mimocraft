@@ -1,128 +1,41 @@
-#define chunkSize 6
+
 
 #include "Game.h"
 
-std::vector<std::string> blocksTextures = { 
-"00.png", "01.png","02.png","03.png", "04.png", "05.png",
-"06.png" };
 
-void Game::init()
+void Game::initGame()
 {
-	
-	this->getWindow().setKeyRepeatEnabled(false);
+	loadScene("playerArea.txt"); 
+	initPLayer();
 
+	this->addSlot("playerArea", signals::rebuild_area, slot_to_rebuild_area);
+}
+
+void Game::initPLayer()
+{
+	AshEntity player;
+
+	//init properties
 	player.addProperty(ash::p_float, "world_x", 0);
-	player.addProperty(ash::p_float, "world_y", 6);
+	player.addProperty(ash::p_float, "world_y", 0);
 	player.addProperty(ash::p_float, "world_z", 1);
 	player.addProperty(ash::p_bool, "updated", false);
+	player.addProperty(ash::p_int, "pre_chunk_x", -1);
+	player.addProperty(ash::p_int, "pre_chunk_y", -1);
 
+	//init texture
 	player.setTexturePath("player.png");
-
 	player.setTextureRect(sf::IntRect(0, 0, 64, 64));
 	player.setScale(1.5,1.5);
 
+	//add
 	player.setName("player");
 	this->pushEntity(player,int(player.getFloat("world_x") + int(player.getFloat("world_y") + int(player.getFloat("world_z")))));
+
+	//scripting
 	this->addScript("playerArea", "player", playerScript);
-
 	this->setEventHandlingFunction(playerInput);
-
 	this->addSlot("playerArea", signals::detonate_player, slot_to_detonate_player);
-
-	areaBuilder();
-}
-
-void Game::areaBuilder()
-{
-	sf::Vector2f realPLayerPos(player.getFloat("world_x"), player.getFloat("world_y"));
 	
-	std::string chunkName = std::to_string(int(realPLayerPos.x / chunkSize)) + "_" + std::to_string(int(realPLayerPos.y / chunkSize));
-	std::vector<BlockInfo> chunkData = chunkParser(chunkName + ".txt");
 
-	
-	for (int i = 0; i < chunkData.size(); ++i)
-	{
-		BlockInfo& block = chunkData[i];
-		AshEntity blockEntity;
-
-		sf::Vector2f blockPosition(block.x, block.y);
-		blockPosition *= float((64 * 0.70));
-		blockEntity.setPosition(rotateIN(blockPosition));
-		blockEntity.move(0,-(32*block.z + 16 * block.x + 16*block.y));
-
-		blockEntity.setName(std::to_string(block.x) + ' ' + std::to_string(block.y) + ' ' + std::to_string(block.z));
-
-		blockEntity.setTexturePath(blocksTextures[block.type]);
-		blockEntity.setTextureRect(sf::IntRect(0, 0, 64, 64));
-		blockEntity.setScale(1, 1);
-		blockEntity.setVisible(true);
-		blockEntity.setColliding(false);
-
-		this->pushEntity(blockEntity, block.x + block.y + block.z);
-		
-	}
-}
-
-int Game::blockTypeParser(const std::string& type)
-{
-	if (type == "-1") { return Blocks::void_b; }
-	if (type == "00") { return Blocks::grass; }
-	if (type == "01") { return Blocks::solid_stone; }
-	if (type == "02") { return Blocks::woods; }
-	if (type == "03") { return Blocks::red_fur; }
-	if (type == "04") { return Blocks::cobble_stone; }
-	if (type == "05") { return Blocks::water; }
-	if (type == "06") { return Blocks::glass; }
-}
-
-std::vector<BlockInfo> Game::chunkParser(const std::string& chunk)
-{
-	std::vector<BlockInfo> resualt;
-	BlockInfo newBLock;
-	std::ifstream chunk_f(chunkDir + chunk);
-
-	if (!chunk_f.is_open()) 
-	{
-		return chunkGenerator(chunk); 
-	}
-	
-	int countOfLays;
-	chunk_f >> countOfLays;
-	std::string type;
-	for (int l = 0; l < countOfLays; ++l)
-	{
-		for (int i = 0; i < chunkSize * chunkSize; ++i)
-		{
-			chunk_f >> type;
-			newBLock.type = blockTypeParser(type);
-			chunk_f >> newBLock.x >> newBLock.y >> newBLock.z;
-
-			if (newBLock.type == Blocks::void_b) { continue; }
-			resualt.push_back(newBLock);
-		}
-	}
-	chunk_f.close();
-	return resualt;
-	
-}
-
-std::vector<BlockInfo> Game::chunkGenerator(const std::string& chunk)
-{
-	//сейчас просто платформу создаю
-
-	int x = std::stoi(chunk.substr(0, chunk.find('_')));
-	int y = std::stoi(chunk.substr(chunk.find('_') + 1, chunk.length() - chunk.find('_')));
-
-	std::ofstream newChunk(chunkDir + chunk);
-	newChunk << "1\n";
-	for (int i = 0 + y*chunkSize; i < 6 + y * chunkSize; ++i)
-	{
-		for (int j = 0 + x * chunkSize; j < 6 + x*chunkSize; ++j)
-		{
-			newChunk << "00 " << j << ' ' << i << ' ' << '0' << "  ";
-		}
-		newChunk << '\n';
-	}
-	newChunk.close();
-	return chunkParser(chunk);
 }
