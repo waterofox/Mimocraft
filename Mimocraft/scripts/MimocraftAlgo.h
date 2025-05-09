@@ -40,6 +40,13 @@ struct BlockInfo
 	blockCords cords;
 	unsigned int hp = 0;
 };
+enum sides
+{
+	South = 0,
+	East = 1,
+	North = 2,
+	West = 3,
+};
 
 static std::map<std::string, std::map<blockCords, BlockInfo>> actualAreaInfo;
 static std::string chunkDir = "data/chunks/";
@@ -47,6 +54,9 @@ static std::string chunkDir = "data/chunks/";
 static std::vector<std::string> blocksTextures = {
 "00.png", "01.png","02.png","03.png", "04.png", "05.png",
 "06.png" };
+
+static int actualSide = sides::South;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -137,7 +147,10 @@ static void loadChunk(AshCore& theCore, const std::string& name)
 		BlockInfo& block = chunkData[i];
 		AshEntity blockEntity;
 
+
 		sf::Vector2f blockPosition(block.cords.x, block.cords.y);
+		blockPosition = rotate(blockPosition, actualSide*90); //area rotation S E N W 
+
 		blockPosition *= float((64 * 0.70));
 		blockEntity.setPosition(rotate(blockPosition,45));
 		blockEntity.move(0, -(32 * block.cords.z + 16 * block.cords.x + 16 * block.cords.y));
@@ -155,4 +168,17 @@ static void loadChunk(AshCore& theCore, const std::string& name)
 		actualAreaInfo[name][block.cords] = block;
 
 	}
+}
+
+static void generalCleanArea(AshCore& theCore)
+{
+	for (auto& chunk : actualAreaInfo)
+	{
+		for (auto& block : chunk.second)
+		{
+			theCore.popEntity(std::to_string(block.second.cords.x) + ' ' + std::to_string(block.second.cords.y) + ' ' + std::to_string(block.second.cords.z),
+				block.second.cords.x + block.second.cords.y + block.second.cords.z);
+		}
+	}
+	actualAreaInfo.clear();
 }

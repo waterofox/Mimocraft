@@ -9,6 +9,7 @@ enum signals
 	right_mous_click = 1,
 	detonate_player = 2,
 	rebuild_area = 3,
+	rotate_area = 4,
 };
 
 
@@ -62,4 +63,9 @@ static void slot_to_rebuild_area(AshCore* theCore, AshEntity& player)
 		if (iterOnChunk == actualAreaInfo.end()){ 
 			loadChunk(*theCore,chunk); }
 	}
+}
+static void slot_to_rotate_area(AshCore* theCore, AshEntity& player)
+{
+	generalCleanArea(*theCore);
+	slot_to_rebuild_area(theCore, player);
 }

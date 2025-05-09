@@ -1,5 +1,4 @@
 #pragma once
-#include "../AshEngine-Alpha-2-AP25/AshEngine/AshEngine.h"
 #include "mimocraftSlots&Signals.h"
 #define playerSpeed 5
 #define deltaTime theCore->getDeltaTime().asSeconds() 
@@ -23,6 +22,18 @@ static void keyBoardChecker(AshCore& theCore, const sf::Keyboard::Key& key,const
 	player.moveUp = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
 	player.moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
 	player.moveLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
+	
+	//rotate?
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+	{
+		actualSide = myMod(actualSide + 1, 4);
+		theCore.emitSignal(rotate_area,player);
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+	{
+		actualSide = myMod(actualSide - 1, 4);
+		theCore.emitSignal(rotate_area, player);
+	}
 }
 
 static void playerInput(AshCore& theCore)

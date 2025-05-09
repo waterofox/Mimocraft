@@ -3,6 +3,7 @@
 #include <cmath>
 #define PI 3.1415926535
 
+
 static sf::Vector2f rotate(const sf::Vector2f& cords, const double& angle)
 {
 	double radians = angle * PI / 180;

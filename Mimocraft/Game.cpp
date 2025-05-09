@@ -9,6 +9,7 @@ void Game::initGame()
 	initPLayer();
 
 	this->addSlot("playerArea", signals::rebuild_area, slot_to_rebuild_area);
+	this->addSlot("playerArea", signals::rotate_area, slot_to_rotate_area);
 }
 
 void Game::initPLayer()
