@@ -68,6 +68,12 @@
     <ClInclude Include="scripts\blocks.h">
       <Filter>scenes&amp;properties</Filter>
     </ClInclude>
+    <ClInclude Include="Algoritm.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\MimocraftAlgo.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\properties.txt">

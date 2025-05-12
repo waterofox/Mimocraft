@@ -1,13 +1,9 @@
 #pragma once
-#include "../AshEngine-Alpha-2-AP25/AshEngine/AshEngine.h"
 #include "mimocraftSlots&Signals.h"
-#include "blocks.h"
 #define playerSpeed 5
 #define deltaTime theCore->getDeltaTime().asSeconds() 
-#define chunkSize 6
 
 using namespace ash;
-
 
 static void keyBoardChecker(AshCore& theCore, const sf::Keyboard::Key& key,const  bool& move)
 {
@@ -21,11 +17,23 @@ static void keyBoardChecker(AshCore& theCore, const sf::Keyboard::Key& key,const
 	default:
 		break;
 	}
-	//AshEntity& player = theCore.getEntity("player");
+
 	player.moveDown = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
 	player.moveUp = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
 	player.moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
 	player.moveLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
+	
+	//rotate?
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+	{
+		actualSide = myMod(actualSide + 1, 4);
+		theCore.emitSignal(rotate_area,player);
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+	{
+		actualSide = myMod(actualSide - 1, 4);
+		theCore.emitSignal(rotate_area, player);
+	}
 }
 
 static void playerInput(AshCore& theCore)
@@ -84,7 +92,7 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 
 	actual *= float((64 * 0.70));
 
-	player.setPosition(rotateIN(actual));
+	player.setPosition(rotate(actual,45));
 	player.move(0, -16);
 	player.move(0, -(32.0*1.5) * player.getFloat("world_z"));
 	player.move(0, -16*player.getFloat("world_y"));
