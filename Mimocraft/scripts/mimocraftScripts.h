@@ -56,6 +56,17 @@ static void playerInput(AshCore& theCore)
 
 static void playerScript(AshCore* theCore, AshEntity& player)
 {
+	
+	sf::Vector2f moveVector;
+	switch (actualSide)
+	{
+	case sides::South: {moveVector = sf::Vector2f(0, 0); }break;
+	case sides::East: {moveVector = sf::Vector2f(chunkSize - 1, 0); }break;
+	case sides::North: {moveVector = sf::Vector2f(chunkSize - 1, chunkSize - 1); } break;
+	case sides::West: {moveVector = sf::Vector2f(0, chunkSize - 1); } break;
+	default:
+		break;
+	}
 
 	if (player.getBool("updated")) { player.getBool("updated") = false; return; }
 
@@ -63,6 +74,11 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 	float y = player.getFloat("world_y");
 	
 	sf::Vector2f actual(x, y);
+	/*
+
+	sf::Vector2f oldPosBySide(actual);
+	oldPosBySide = rotate(oldPosBySide, actualSide * 90); //area rotation S E N W 
+	oldPosBySide += moveVector;
 
 
 	if (player.moveUp) { actual.y -= playerSpeed * deltaTime; }
@@ -72,12 +88,17 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 	if (player.moveRight) { actual.x += playerSpeed * deltaTime; }
 
 	
-
+	
 	if (actual.x < 0 or actual.y < 0) { return; }
+
+	*/
 
 	player.getFloat("world_x") = actual.x;
 	player.getFloat("world_y") = actual.y;
+
 	sf::Vector2f temp = actual;
+
+
 
 	sf::Vector2i actualChunk;
 	actualChunk.x = int(actual.x / chunkSize);
@@ -89,21 +110,27 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 		theCore->emitSignal(rebuild_area, player);
 	}
 
+	/*
+	sf::Vector2f posBySide = temp;
 
-	actual *= float((64 * 0.70));
+	posBySide = rotate(posBySide, actualSide * 90); //area rotation S E N W 
+	posBySide += moveVector;
 
-	player.setPosition(rotate(actual,45));
+
+	posBySide *= float((64 * 0.70));
+
+	player.setPosition(rotate(posBySide,45));
 	player.move(0, -16);
 	player.move(0, -(32.0*1.5) * player.getFloat("world_z"));
-	player.move(0, -16*player.getFloat("world_y"));
-	player.move(0, -16 * player.getFloat("world_x"));
+	player.move(0, -16*posBySide.y);
+	player.move(0, -16 * posBySide.x);
 
 	
 	if (int(temp.x) + int(temp.y) != int(x) + int(y))
 	{
 		AshEntity PlayerTwo = player;
-		int newLay = int(player.getFloat("world_z")) + int(temp.x) + int(temp.y);
-		int oldLay = int(x) + int(y) + int(player.getFloat("world_z"));
+		int newLay = int(player.getFloat("world_z")) + int(posBySide.x) + int(posBySide.y);
+		int oldLay = int(oldPosBySide.x) + int(oldPosBySide.y) + int(player.getFloat("world_z"));
 
 		if (newLay > oldLay) { PlayerTwo.getBool("updated") = true; }
 
@@ -112,7 +139,7 @@ static void playerScript(AshCore* theCore, AshEntity& player)
 		player.getFloat("world_y") = y;
 		theCore->emitSignal(detonate_player, player);
 	}
-
+	*/
 }
 
 

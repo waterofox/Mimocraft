@@ -68,4 +68,5 @@ static void slot_to_rotate_area(AshCore* theCore, AshEntity& player)
 {
 	generalCleanArea(*theCore);
 	slot_to_rebuild_area(theCore, player);
+	oldSide = actualSide;
 }
