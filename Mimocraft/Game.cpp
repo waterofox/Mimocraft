@@ -23,6 +23,7 @@ void Game::initPLayer()
 	player.addProperty(ash::p_bool, "updated", false);
 	player.addProperty(ash::p_int, "pre_chunk_x", -1);
 	player.addProperty(ash::p_int, "pre_chunk_y", -1);
+	player.addProperty(ash::p_int, "lay", 1);
 
 	//init texture
 	player.setTexturePath("player.png");

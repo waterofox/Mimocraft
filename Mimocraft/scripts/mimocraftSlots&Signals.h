@@ -15,7 +15,8 @@ enum signals
 
 static void slot_to_detonate_player(AshCore* theCore, AshEntity& oldPLayer)
 {
-	theCore->popEntity("player", int(oldPLayer.getFloat("world_x")) + int(oldPLayer.getFloat("world_y")) + int(oldPLayer.getFloat("world_z")));
+	theCore->popEntity("player", oldPLayer.getInt("lay"));
+
 	AshEntity& newPlayer = theCore->getEntity("player");
 	newPlayer.setTexture(theCore->getResourceManager().getTexture("player.png"));
 }
@@ -69,4 +70,20 @@ static void slot_to_rotate_area(AshCore* theCore, AshEntity& player)
 	generalCleanArea(*theCore);
 	slot_to_rebuild_area(theCore, player);
 	oldSide = actualSide;
+	
+	AshEntity PlayerTwo = player;
+	sf::Vector2f newPLayerPos(player.getFloat("world_x"), player.getFloat("world_y"));
+	newPLayerPos = rotateCordsBySide(newPLayerPos, true);
+	deployPlayer(PlayerTwo, newPLayerPos);
+	int newLay = int(newPLayerPos.x) + int(newPLayerPos.y) + int(player.getFloat("world_z"));
+	if (newLay != PlayerTwo.getInt("lay"))
+	{
+		PlayerTwo.getInt("lay") = newLay;
+		theCore->pushEntity(PlayerTwo, newLay);
+		theCore->emitSignal(detonate_player, player);
+		return;
+
+	}
+	player = PlayerTwo;
+	player.setTexture(theCore->getResourceManager().getTexture("player.png"));
 }

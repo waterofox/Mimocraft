@@ -57,6 +57,7 @@ static std::vector<std::string> blocksTextures = {
 
 static int actualSide = sides::South;
 static int oldSide = sides::South;
+static bool needRotation = false;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -79,12 +80,58 @@ static void saveChunk(const std::string& name)
 	chunk.close();
 
 }
+
+static sf::Vector2f rotateCordsBySide(const sf::Vector2f& cords, const bool& flag)
+{
+	sf::Vector2f position(cords);
+	if (flag)
+	{
+		position = rotate(position, actualSide * 90); //area rotation S E N W 
+	}
+	else
+	{
+		position = rotate(position, oldSide * 90); //area rotation S E N W 
+	}
+	sf::Vector2f moveVector;
+
+	if (flag)
+	{
+		switch (actualSide)
+		{
+		case sides::South: {moveVector = sf::Vector2f(0, 0); }break;
+		case sides::East: {moveVector = sf::Vector2f(chunkSize - 1, 0); }break;
+		case sides::North: {moveVector = sf::Vector2f(chunkSize - 1, chunkSize - 1); } break;
+		case sides::West: {moveVector = sf::Vector2f(0, chunkSize - 1); } break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		switch (oldSide)
+		{
+		case sides::South: {moveVector = sf::Vector2f(0, 0); }break;
+		case sides::East: {moveVector = sf::Vector2f(chunkSize - 1, 0); }break;
+		case sides::North: {moveVector = sf::Vector2f(chunkSize - 1, chunkSize - 1); } break;
+		case sides::West: {moveVector = sf::Vector2f(0, chunkSize - 1); } break;
+		default:
+			break;
+		}
+	}
+
+	position += moveVector;
+
+	return position;
+}
+
 static void clearArea(AshCore& theCore, const std::string& chunk)
 {
 	for (auto& block : actualAreaInfo[chunk])
 	{
+		sf::Vector2f actualPosition = rotateCordsBySide(sf::Vector2f(block.second.cords.x, block.second.cords.y), false);
+
 		theCore.popEntity(std::to_string(block.second.cords.x) + ' ' + std::to_string(block.second.cords.y) + ' ' + std::to_string(block.second.cords.z),
-			block.second.cords.x + block.second.cords.y + block.second.cords.z);
+			int(actualPosition.x) + int(actualPosition.y) + int(block.second.cords.z));
 	}
 }
 
@@ -137,48 +184,6 @@ static std::vector<BlockInfo> chunkParser(const std::string& chunk)
 	return resualt;
 }
 
-static sf::Vector2f rotateCordsBySide(const sf::Vector2f& cords, const bool& flag)
-{
-	sf::Vector2f position(cords);
-	if (flag)
-	{
-		position = rotate(position, actualSide * 90); //area rotation S E N W 
-	}
-	else
-	{
-		position = rotate(position, oldSide * 90); //area rotation S E N W 
-	}
-	sf::Vector2f moveVector;
-
-	if (flag)
-	{
-		switch (actualSide)
-		{
-		case sides::South: {moveVector = sf::Vector2f(0, 0); }break;
-		case sides::East: {moveVector = sf::Vector2f(chunkSize - 1, 0); }break;
-		case sides::North: {moveVector = sf::Vector2f(chunkSize - 1, chunkSize - 1); } break;
-		case sides::West: {moveVector = sf::Vector2f(0, chunkSize - 1); } break;
-		default:
-			break;
-		}
-	}
-	else
-	{
-		switch (oldSide)
-		{
-		case sides::South: {moveVector = sf::Vector2f(0, 0); }break;
-		case sides::East: {moveVector = sf::Vector2f(chunkSize - 1, 0); }break;
-		case sides::North: {moveVector = sf::Vector2f(chunkSize - 1, chunkSize - 1); } break;
-		case sides::West: {moveVector = sf::Vector2f(0, chunkSize - 1); } break;
-		default:
-			break;
-		}
-	}
-
-	position += moveVector;
-
-	return position;
-}
 
 
 static void loadChunk(AshCore& theCore, const std::string& name)
@@ -230,4 +235,16 @@ static void generalCleanArea(AshCore& theCore)
 		}
 	}
 	actualAreaInfo.clear();
+}
+
+static void deployPlayer(ash::AshEntity& player, sf::Vector2f cordsToDraw)
+{
+	sf::Vector2f temp(cordsToDraw);
+	cordsToDraw *= float((64 * 0.70));
+
+	player.setPosition(rotate(cordsToDraw, 45));
+	player.move(0, -16);
+	player.move(0, -(32.0 * 1.5) * player.getFloat("world_z"));
+	player.move(0, -16 * temp.x);
+	player.move(0, -16 * temp.y);
 }
