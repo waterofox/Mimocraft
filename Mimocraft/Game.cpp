@@ -38,6 +38,9 @@ void Game::initPLayer()
 	this->addScript("playerArea", "player", playerScript);
 	this->setEventHandlingFunction(playerInput);
 	this->addSlot("playerArea", signals::detonate_player, slot_to_detonate_player);
-	
+
+	//animation;
+	AshAnimator& animator = this->getAnimator();
+	animator.addAnimation("player.png", 4, 10, true);
 
 }

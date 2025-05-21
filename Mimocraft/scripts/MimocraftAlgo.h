@@ -5,6 +5,7 @@
 #include "blocks.h"
 #include "Algoritm.h"
 #define chunkSize 6
+#define Sz 64.f //size of block's sprite
 
 //std
 #include <set>
@@ -184,7 +185,16 @@ static std::vector<BlockInfo> chunkParser(const std::string& chunk)
 	return resualt;
 }
 
+static sf::Vector2f drawLinOperator(const sf::Vector2f& cords)
+{
+	sf::Vector2f newCords;
+	float a = Sz/2;
+	float b = Sz/4;
+	newCords.x = a * cords.x - a * cords.y;
+	newCords.y = b * cords.x + b * cords.y;
 
+	return newCords;
+ }
 
 static void loadChunk(AshCore& theCore, const std::string& name)
 {
@@ -201,10 +211,8 @@ static void loadChunk(AshCore& theCore, const std::string& name)
 		blockPosition = rotateCordsBySide(blockPosition,true);
 		sf::Vector2f temp = blockPosition;
 
-		blockPosition *= float((64 * 0.70));
-
-		blockEntity.setPosition(rotate(blockPosition,45));
-		blockEntity.move(0, -(32 * block.cords.z + 16 * temp.x + 16 * temp.y));
+		blockEntity.setPosition(drawLinOperator(blockPosition));
+		blockEntity.move(0, -(32* block.cords.z));
 
 		blockEntity.setName(std::to_string(block.cords.x) + ' ' + std::to_string(block.cords.y) + ' ' + std::to_string(block.cords.z));
 
