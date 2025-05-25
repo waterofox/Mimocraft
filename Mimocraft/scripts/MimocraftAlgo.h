@@ -6,7 +6,7 @@
 #include "Algoritm.h"
 #define chunkSize 6
 #define Sz 64.f //size of block's sprite
-
+#define its std::to_string
 //std
 #include <set>
 
@@ -52,9 +52,11 @@ enum sides
 static std::map<std::string, std::map<blockCords, BlockInfo>> actualAreaInfo;
 static std::string chunkDir = "data/chunks/";
 
+static AshEntity* lastLightBlock = nullptr;
+
 static std::vector<std::string> blocksTextures = {
 "00.png", "01.png","02.png","03.png", "04.png", "05.png",
-"06.png" };
+"06.png", "07.png"};
 
 static int actualSide = sides::South;
 static int oldSide = sides::South;
@@ -211,6 +213,11 @@ static void loadChunk(AshCore& theCore, const std::string& name)
 		blockPosition = rotateCordsBySide(blockPosition,true);
 		sf::Vector2f temp = blockPosition;
 
+		//blockPosition *= float(64 * 0.707);
+		//blockEntity.setPosition(rotate(blockPosition, 45));
+		//blockEntity.move(0, -(16*block.cords.x + 16 * block.cords.y));
+
+
 		blockEntity.setPosition(drawLinOperator(blockPosition));
 		blockEntity.move(0, -(32* block.cords.z));
 
@@ -255,4 +262,43 @@ static void deployPlayer(ash::AshEntity& player, sf::Vector2f cordsToDraw)
 	player.move(0, -(32.0 * 1.5) * player.getFloat("world_z"));
 	player.move(0, -16 * temp.x);
 	player.move(0, -16 * temp.y);
+}
+
+static void detectBlock(AshCore* thCore, AshEntity& player,sf::Vector2f& cursor)
+{
+	if (lastLightBlock != nullptr)
+	{
+		lastLightBlock->setTextureRect(sf::IntRect(0, 0, Sz, Sz));
+		lastLightBlock == nullptr;
+	}
+
+	sf::Vector3i playerPos(int(player.getFloat("world_x")), int(player.getFloat("world_y")), int(player.getFloat("world_z")));
+	sf::Vector3i firstBlock(playerPos); firstBlock += sf::Vector3i(2, 2, 2);
+	sf::Vector3i lasttBlock(playerPos); lasttBlock -= sf::Vector3i(2, 2, 2);
+	for (int z = firstBlock.z; z >= lasttBlock.z; --z)
+	{
+		for (int y = firstBlock.y; y >= lasttBlock.y and y >= 0; --y)
+		{
+			for (int x = firstBlock.x; x >= lasttBlock.x and x >= 0; --x)
+			{
+				AshCore::sceneType* scene = thCore->getActualScene();
+				auto layIter = scene->find(x + y + z);
+				if (layIter != scene->end() and !(*layIter).second.empty())
+				{
+					auto iterOnBlock = (*layIter).second.find(its(x) + ' ' + its(y) + ' ' + its(z));
+					if (iterOnBlock != (*layIter).second.end())
+					{
+						AshEntity& actualBlock = (*iterOnBlock).second;
+						if (actualBlock.getGlobalBounds().contains(cursor))
+						{
+							lastLightBlock = &actualBlock;
+							actualBlock.setTextureRect(sf::IntRect(Sz, 0, Sz, Sz));
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+
 }

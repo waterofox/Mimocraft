@@ -8,5 +8,6 @@ static enum Blocks
 	red_fur = 3,
 	cobble_stone = 4,
 	water = 5,
-	glass = 6
+	glass = 6,
+	cobble_stone_grass = 7,
 };

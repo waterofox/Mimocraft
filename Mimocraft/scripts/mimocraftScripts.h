@@ -51,8 +51,12 @@ static void playerInput(AshCore& theCore)
 			break;
 		}
 
+		AshEntity& player = theCore.getEntity("player");
+		sf::Vector2f cursor(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+		detectBlock(&theCore, player,cursor);
 	}
 }
+
 
 static void playerScript(AshCore* theCore, AshEntity& player)
 {
