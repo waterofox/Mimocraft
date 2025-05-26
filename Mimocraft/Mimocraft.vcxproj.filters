@@ -19,6 +19,9 @@
     <Filter Include="scenes&amp;properties">
       <UniqueIdentifier>{6f0544b1-0cc8-447c-a78b-40150a93f1c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="betterShape">
+      <UniqueIdentifier>{c98c4492-66cb-4c1d-b5ab-30aa65f9df0b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -38,6 +41,15 @@
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="staff\PolygonShape.cpp">
+      <Filter>betterShape</Filter>
+    </ClCompile>
+    <ClCompile Include="staff\Shape.cpp">
+      <Filter>betterShape</Filter>
+    </ClCompile>
+    <ClCompile Include="staff\Line.cpp">
+      <Filter>betterShape</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,11 +80,20 @@
     <ClInclude Include="scripts\blocks.h">
       <Filter>scenes&amp;properties</Filter>
     </ClInclude>
-    <ClInclude Include="Algoritm.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="scripts\MimocraftAlgo.h">
       <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="staff\Algoritm.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="staff\PolygonShape.h">
+      <Filter>betterShape</Filter>
+    </ClInclude>
+    <ClInclude Include="staff\Shape.h">
+      <Filter>betterShape</Filter>
+    </ClInclude>
+    <ClInclude Include="staff\Line.h">
+      <Filter>betterShape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

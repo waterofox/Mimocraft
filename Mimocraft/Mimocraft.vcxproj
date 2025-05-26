@@ -136,9 +136,11 @@
     <ClCompile Include="AshEngine-Alpha-2-AP25\AshEngine\AshResourceManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="staff\Line.cpp" />
+    <ClCompile Include="staff\PolygonShape.cpp" />
+    <ClCompile Include="staff\Shape.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Algoritm.h" />
     <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshAnimator.h" />
     <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshCore.h" />
     <ClInclude Include="AshEngine-Alpha-2-AP25\AshEngine\AshEngine.h" />
@@ -149,6 +151,10 @@
     <ClInclude Include="scripts\MimocraftAlgo.h" />
     <ClInclude Include="scripts\mimocraftScripts.h" />
     <ClInclude Include="scripts\mimocraftSlots&amp;Signals.h" />
+    <ClInclude Include="staff\Algoritm.h" />
+    <ClInclude Include="staff\Line.h" />
+    <ClInclude Include="staff\PolygonShape.h" />
+    <ClInclude Include="staff\Shape.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\properties.txt" />

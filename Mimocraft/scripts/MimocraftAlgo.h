@@ -1,6 +1,7 @@
 #pragma once
 //AshEngine
 #include "../AshEngine-Alpha-2-AP25/AshEngine/AshEngine.h"
+#include "../staff/PolygonShape.h"
 //Mimocraft
 #include "blocks.h"
 #include "Algoritm.h"
@@ -213,11 +214,6 @@ static void loadChunk(AshCore& theCore, const std::string& name)
 		blockPosition = rotateCordsBySide(blockPosition,true);
 		sf::Vector2f temp = blockPosition;
 
-		//blockPosition *= float(64 * 0.707);
-		//blockEntity.setPosition(rotate(blockPosition, 45));
-		//blockEntity.move(0, -(16*block.cords.x + 16 * block.cords.y));
-
-
 		blockEntity.setPosition(drawLinOperator(blockPosition));
 		blockEntity.move(0, -(32* block.cords.z));
 
@@ -289,11 +285,54 @@ static void detectBlock(AshCore* thCore, AshEntity& player,sf::Vector2f& cursor)
 					if (iterOnBlock != (*layIter).second.end())
 					{
 						AshEntity& actualBlock = (*iterOnBlock).second;
-						if (actualBlock.getGlobalBounds().contains(cursor))
+						sf::FloatRect bounds = actualBlock.getGlobalBounds();
+						//начинатеся жесть
+
+						std::vector<Point> blockPoints = {Point(bounds.left + (Sz / 2),bounds.top),
+														  Point(bounds.left + Sz,bounds.top + Sz / 4),
+														  Point(bounds.left + Sz,bounds.top + 3 * Sz / 4),
+														  Point(bounds.left + Sz / 2,bounds.top + Sz),
+														  Point(bounds.left, bounds.top + 3*Sz/4),
+														  Point(bounds.left, bounds.top + Sz/4)};
+						::PolygonShape blockShape(blockPoints);
+						Point pointOfCursor;
+						pointOfCursor.x = cursor.x;
+						pointOfCursor.y = cursor.y;
+
+						if (blockShape.containsPoint(pointOfCursor))
 						{
 							lastLightBlock = &actualBlock;
-							actualBlock.setTextureRect(sf::IntRect(Sz, 0, Sz, Sz));
-							return;
+							std::vector<Point> topPoints = {Point(bounds.left + (Sz / 2),bounds.top),
+															Point(bounds.left + Sz,bounds.top + Sz / 4),
+															Point(bounds.left + Sz/2,bounds.top + Sz/2),
+															Point(bounds.left, bounds.top + Sz/4)};
+							::PolygonShape top(topPoints);
+							if (top.containsPoint(pointOfCursor))
+							{
+								actualBlock.setTextureRect(sf::IntRect(Sz, 0, Sz, Sz));
+								//
+								return;
+							}
+							else
+							{
+								std::vector<Point> leftPoints = {Point(bounds.left,bounds.top + Sz/4),
+																 Point(bounds.left + Sz / 2,bounds.top + Sz / 2),
+																 Point(bounds.left + Sz / 2,bounds.top + Sz),
+																 Point(bounds.left,bounds.top + 3 * Sz / 4) };
+								::PolygonShape left(leftPoints);
+								if (left.containsPoint(pointOfCursor))
+								{
+									actualBlock.setTextureRect(sf::IntRect(Sz*2, 0, Sz, Sz));
+									//
+									return;
+								}
+								else
+								{
+									actualBlock.setTextureRect(sf::IntRect(Sz * 3, 0, Sz, Sz));
+									//
+									return;
+								}
+							}
 						}
 					}
 				}
