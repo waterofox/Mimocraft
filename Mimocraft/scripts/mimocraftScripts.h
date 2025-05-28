@@ -40,10 +40,18 @@ static void playerInput(AshCore& theCore)
 {
 	sf::Event& event = theCore.getActualEvent();
 	sf::RenderWindow& window = theCore.getWindow();
+	AshEntity& player = theCore.getEntity("player");
 	while (window.pollEvent(event))
 	{
 		switch (event.type)
 		{
+		case sf::Event::MouseButtonPressed: {
+			if (event.key.code == sf::Mouse::Button::Right)
+			{
+				slot_to_place_block(&theCore, player);
+			}
+
+		} break;
 		case sf::Event::Closed: {window.close(); } break;
 		case sf::Event::KeyPressed: {keyBoardChecker(theCore,event.key.code, true); } break;
 		case sf::Event::KeyReleased: {keyBoardChecker(theCore,event.key.code, false); } break;
@@ -51,7 +59,6 @@ static void playerInput(AshCore& theCore)
 			break;
 		}
 
-		AshEntity& player = theCore.getEntity("player");
 		sf::Vector2f cursor(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 		detectBlock(&theCore, player,cursor);
 	}

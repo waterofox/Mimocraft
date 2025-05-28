@@ -10,6 +10,7 @@ enum signals
 	detonate_player = 2,
 	rebuild_area = 3,
 	rotate_area = 4,
+	place_block = 5, 
 };
 
 
@@ -86,4 +87,50 @@ static void slot_to_rotate_area(AshCore* theCore, AshEntity& player)
 	}
 	player = PlayerTwo;
 	player.setTexture(theCore->getResourceManager().getTexture("player.png"));
+}
+static void slot_to_place_block(AshCore* theCore, AshEntity& player)
+{
+	BlockInfo block;
+	block.type = Blocks::cobble_stone;
+	if (lastLightBlock != nullptr)
+	{
+		blockCords& cords = block.cords;
+		cords.x = (*lastLightBlock).getInt("world_x");
+		cords.y = (*lastLightBlock).getInt("world_y");
+		cords.z = (*lastLightBlock).getInt("world_z");
+		switch (sideOfLastLigthBlock)
+		{
+		case blockSides::top:   {cords.z += 1;} break;
+		case blockSides::left:  {cords.y += 1;} break;
+		case blockSides::rigth: {cords.x += 1;} break;
+		default:
+			break;
+		}
+		if (actualSide != sides::South and sideOfLastLigthBlock != blockSides::top)
+		{
+			switch (actualSide)
+			{
+			case sides::East: 
+			{
+				cords.y -= 1;
+				if (sideOfLastLigthBlock == blockSides::left) { cords.x += 1; }
+				else{cords.x -= 1;}
+			}break;
+			case sides::North: 
+			{
+				if (sideOfLastLigthBlock == blockSides::left) { cords.y -= 2; }
+				else { cords.x -= 2; }
+			} break;
+			case sides::West: 
+			{
+				cords.x -= 1;
+				if (sideOfLastLigthBlock == blockSides::left) { cords.y -= 1; }
+				else { cords.y += 1; }
+			} break;
+			default:
+				break;
+			}
+		}
+		deplyBlock(*theCore, block, its(cords.x / chunkSize) + '_' + its(cords.y / chunkSize));
+	}
 }

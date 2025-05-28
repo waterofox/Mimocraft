@@ -42,6 +42,12 @@ struct BlockInfo
 	blockCords cords;
 	unsigned int hp = 0;
 };
+enum blockSides
+{
+	top =0,
+	left = 1,
+	rigth = 2,
+};
 enum sides
 {
 	South = 0,
@@ -54,6 +60,7 @@ static std::map<std::string, std::map<blockCords, BlockInfo>> actualAreaInfo;
 static std::string chunkDir = "data/chunks/";
 
 static AshEntity* lastLightBlock = nullptr;
+static int sideOfLastLigthBlock = -1;
 
 static std::vector<std::string> blocksTextures = {
 "00.png", "01.png","02.png","03.png", "04.png", "05.png",
@@ -198,7 +205,34 @@ static sf::Vector2f drawLinOperator(const sf::Vector2f& cords)
 
 	return newCords;
  }
+static void deplyBlock(AshCore& theCore,BlockInfo block,const std::string& chunkName)
+{
+	AshEntity blockEntity;
 
+
+	sf::Vector2f blockPosition(block.cords.x, block.cords.y);
+	blockPosition = rotateCordsBySide(blockPosition, true);
+	sf::Vector2f temp = blockPosition;
+
+	blockEntity.setPosition(drawLinOperator(blockPosition));
+	blockEntity.move(0, -(32 * block.cords.z));
+
+	blockEntity.setName(std::to_string(block.cords.x) + ' ' + std::to_string(block.cords.y) + ' ' + std::to_string(block.cords.z));
+
+	blockEntity.setTexturePath(blocksTextures[block.type]);
+	blockEntity.setTextureRect(sf::IntRect(0, 0, 64, 64));
+	blockEntity.setScale(1, 1);
+	blockEntity.setVisible(true);
+	blockEntity.setColliding(false);
+
+	blockEntity.addProperty(p_int, "world_x", block.cords.x);
+	blockEntity.addProperty(p_int, "world_y", block.cords.y);
+	blockEntity.addProperty(p_int, "world_z", block.cords.z);
+
+	theCore.pushEntity(blockEntity, int(temp.x) + int(temp.y) + int(block.cords.z));
+
+	actualAreaInfo[chunkName][block.cords] = block;
+}
 static void loadChunk(AshCore& theCore, const std::string& name)
 {
 	std::vector<BlockInfo> chunkData = chunkParser(name + ".txt");
@@ -207,28 +241,7 @@ static void loadChunk(AshCore& theCore, const std::string& name)
 	for (int i = 0; i < chunkData.size(); ++i)
 	{
 		BlockInfo& block = chunkData[i];
-		AshEntity blockEntity;
-
-
-		sf::Vector2f blockPosition(block.cords.x, block.cords.y);
-		blockPosition = rotateCordsBySide(blockPosition,true);
-		sf::Vector2f temp = blockPosition;
-
-		blockEntity.setPosition(drawLinOperator(blockPosition));
-		blockEntity.move(0, -(32* block.cords.z));
-
-		blockEntity.setName(std::to_string(block.cords.x) + ' ' + std::to_string(block.cords.y) + ' ' + std::to_string(block.cords.z));
-
-		blockEntity.setTexturePath(blocksTextures[block.type]);
-		blockEntity.setTextureRect(sf::IntRect(0, 0, 64, 64));
-		blockEntity.setScale(1, 1);
-		blockEntity.setVisible(true);
-		blockEntity.setColliding(false);
-
-		theCore.pushEntity(blockEntity, int(temp.x) + int(temp.y) + int(block.cords.z));
-
-		actualAreaInfo[name][block.cords] = block;
-
+		deplyBlock(theCore, block, name);
 	}
 }
 
@@ -259,7 +272,70 @@ static void deployPlayer(ash::AshEntity& player, sf::Vector2f cordsToDraw)
 	player.move(0, -16 * temp.x);
 	player.move(0, -16 * temp.y);
 }
+static bool confirmBlock(AshCore* theCore, int x, int y, int z,sf::Vector2f cursor)
+{
+	AshCore::sceneType* scene = theCore->getActualScene();
+	sf::Vector2f temp(x, y); temp = rotateCordsBySide(temp, true);
+	auto layIter = scene->find(int(temp.x) + int(temp.y) + z);
+	if (layIter != scene->end() and !(*layIter).second.empty())
+	{
+		auto iterOnBlock = (*layIter).second.find(its(x) + ' ' + its(y) + ' ' + its(z));
+		if (iterOnBlock != (*layIter).second.end())
+		{
+			AshEntity& actualBlock = (*iterOnBlock).second;
+			sf::FloatRect bounds = actualBlock.getGlobalBounds();
+			//начинатеся жесть
 
+			std::vector<Point> blockPoints = { Point(bounds.left + (Sz / 2),bounds.top),
+											  Point(bounds.left + Sz,bounds.top + Sz / 4),
+											  Point(bounds.left + Sz,bounds.top + 3 * Sz / 4),
+											  Point(bounds.left + Sz / 2,bounds.top + Sz),
+											  Point(bounds.left, bounds.top + 3 * Sz / 4),
+											  Point(bounds.left, bounds.top + Sz / 4) };
+			::PolygonShape blockShape(blockPoints);
+			Point pointOfCursor;
+			pointOfCursor.x = cursor.x;
+			pointOfCursor.y = cursor.y;
+
+			if (blockShape.containsPoint(pointOfCursor))
+			{
+				lastLightBlock = &actualBlock;
+				std::vector<Point> topPoints = { Point(bounds.left + (Sz / 2),bounds.top),
+												Point(bounds.left + Sz,bounds.top + Sz / 4),
+												Point(bounds.left + Sz / 2,bounds.top + Sz / 2),
+												Point(bounds.left, bounds.top + Sz / 4) };
+				::PolygonShape top(topPoints);
+				if (top.containsPoint(pointOfCursor))
+				{
+					actualBlock.setTextureRect(sf::IntRect(Sz, 0, Sz, Sz));
+					sideOfLastLigthBlock = blockSides::top;
+					return true;
+				}
+				else
+				{
+					std::vector<Point> leftPoints = { Point(bounds.left,bounds.top + Sz / 4),
+													 Point(bounds.left + Sz / 2,bounds.top + Sz / 2),
+													 Point(bounds.left + Sz / 2,bounds.top + Sz),
+													 Point(bounds.left,bounds.top + 3 * Sz / 4) };
+					::PolygonShape left(leftPoints);
+					if (left.containsPoint(pointOfCursor))
+					{
+						actualBlock.setTextureRect(sf::IntRect(Sz * 2, 0, Sz, Sz));
+						sideOfLastLigthBlock = blockSides::left;
+						return true;
+					}
+					else
+					{
+						actualBlock.setTextureRect(sf::IntRect(Sz * 3, 0, Sz, Sz));
+						sideOfLastLigthBlock = blockSides::rigth;
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
 static void detectBlock(AshCore* thCore, AshEntity& player,sf::Vector2f& cursor)
 {
 	if (lastLightBlock != nullptr)
@@ -267,77 +343,57 @@ static void detectBlock(AshCore* thCore, AshEntity& player,sf::Vector2f& cursor)
 		lastLightBlock->setTextureRect(sf::IntRect(0, 0, Sz, Sz));
 		lastLightBlock == nullptr;
 	}
+	sideOfLastLigthBlock = -1;
 
 	sf::Vector3i playerPos(int(player.getFloat("world_x")), int(player.getFloat("world_y")), int(player.getFloat("world_z")));
-	sf::Vector3i firstBlock(playerPos); firstBlock += sf::Vector3i(2, 2, 2);
-	sf::Vector3i lasttBlock(playerPos); lasttBlock -= sf::Vector3i(2, 2, 2);
-	for (int z = firstBlock.z; z >= lasttBlock.z; --z)
+	sf::Vector3i firstBlock(playerPos); 
+	sf::Vector3i lasttBlock(playerPos);
+	switch (actualSide)
 	{
-		for (int y = firstBlock.y; y >= lasttBlock.y and y >= 0; --y)
-		{
-			for (int x = firstBlock.x; x >= lasttBlock.x and x >= 0; --x)
-			{
-				AshCore::sceneType* scene = thCore->getActualScene();
-				auto layIter = scene->find(x + y + z);
-				if (layIter != scene->end() and !(*layIter).second.empty())
-				{
-					auto iterOnBlock = (*layIter).second.find(its(x) + ' ' + its(y) + ' ' + its(z));
-					if (iterOnBlock != (*layIter).second.end())
-					{
-						AshEntity& actualBlock = (*iterOnBlock).second;
-						sf::FloatRect bounds = actualBlock.getGlobalBounds();
-						//начинатеся жесть
-
-						std::vector<Point> blockPoints = {Point(bounds.left + (Sz / 2),bounds.top),
-														  Point(bounds.left + Sz,bounds.top + Sz / 4),
-														  Point(bounds.left + Sz,bounds.top + 3 * Sz / 4),
-														  Point(bounds.left + Sz / 2,bounds.top + Sz),
-														  Point(bounds.left, bounds.top + 3*Sz/4),
-														  Point(bounds.left, bounds.top + Sz/4)};
-						::PolygonShape blockShape(blockPoints);
-						Point pointOfCursor;
-						pointOfCursor.x = cursor.x;
-						pointOfCursor.y = cursor.y;
-
-						if (blockShape.containsPoint(pointOfCursor))
-						{
-							lastLightBlock = &actualBlock;
-							std::vector<Point> topPoints = {Point(bounds.left + (Sz / 2),bounds.top),
-															Point(bounds.left + Sz,bounds.top + Sz / 4),
-															Point(bounds.left + Sz/2,bounds.top + Sz/2),
-															Point(bounds.left, bounds.top + Sz/4)};
-							::PolygonShape top(topPoints);
-							if (top.containsPoint(pointOfCursor))
-							{
-								actualBlock.setTextureRect(sf::IntRect(Sz, 0, Sz, Sz));
-								//
-								return;
-							}
-							else
-							{
-								std::vector<Point> leftPoints = {Point(bounds.left,bounds.top + Sz/4),
-																 Point(bounds.left + Sz / 2,bounds.top + Sz / 2),
-																 Point(bounds.left + Sz / 2,bounds.top + Sz),
-																 Point(bounds.left,bounds.top + 3 * Sz / 4) };
-								::PolygonShape left(leftPoints);
-								if (left.containsPoint(pointOfCursor))
-								{
-									actualBlock.setTextureRect(sf::IntRect(Sz*2, 0, Sz, Sz));
-									//
-									return;
-								}
-								else
-								{
-									actualBlock.setTextureRect(sf::IntRect(Sz * 3, 0, Sz, Sz));
-									//
-									return;
-								}
-							}
-						}
-					}
+	case sides::South: {
+		firstBlock += sf::Vector3i(2, 2, 2); lasttBlock -= sf::Vector3i(2, 2, 2); 
+		for (int z = firstBlock.z; z >= lasttBlock.z; --z){
+			for (int y = firstBlock.y; y >= lasttBlock.y and y >= 0; --y){
+				for (int x = firstBlock.x; x >= lasttBlock.x and x >= 0; --x){
+					if (confirmBlock(thCore, x, y, z, cursor)) { return; };
 				}
 			}
 		}
+	} break;
+	case sides::East: {
+		firstBlock += sf::Vector3i(2, -2, 2); lasttBlock -= sf::Vector3i(2, -2, 2);
+		for (int z = firstBlock.z; z >= lasttBlock.z; --z) {
+			for (int y = firstBlock.y; y <= lasttBlock.y ; ++y) {
+				for (int x = firstBlock.x; x >= lasttBlock.x and x >= 0; --x) {
+					if (confirmBlock(thCore, x, y, z, cursor)) { return; };
+				}
+			}
+		}
+	} break;
+	case sides::North: {
+		firstBlock -= sf::Vector3i(2, 2, -2); lasttBlock += sf::Vector3i(2, 2, -2); 
+		for (int z = firstBlock.z; z >= lasttBlock.z; --z) {
+			for (int y = firstBlock.y; y <= lasttBlock.y; ++y) {
+				for (int x = firstBlock.x; x <= lasttBlock.x; ++x) {
+					if (confirmBlock(thCore, x, y, z, cursor)) { return; };
+				}
+			}
+		}
+	} break;
+	case sides::West: {
+		firstBlock -= sf::Vector3i(2, -2, -2); lasttBlock += sf::Vector3i(2, -2, -2); 
+		for (int z = firstBlock.z; z >= lasttBlock.z; --z) {
+			for (int y = firstBlock.y; y >= lasttBlock.y and y >= 0; --y) {
+				for (int x = firstBlock.x; x <= lasttBlock.x; ++x) {
+					if (confirmBlock(thCore, x, y, z, cursor)) { return; };
+				}
+			}
+		}
+	} break;
+	default:
+		break;
 	}
+	//sf::Vector3i firstBlock(playerPos); firstBlock += sf::Vector3i(2, 2, 2);
+	//sf::Vector3i lasttBlock(playerPos); lasttBlock -= sf::Vector3i(2, 2, 2);
 
 }
