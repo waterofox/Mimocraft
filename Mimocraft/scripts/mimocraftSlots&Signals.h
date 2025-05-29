@@ -10,9 +10,41 @@ enum signals
 	detonate_player = 2,
 	rebuild_area = 3,
 	rotate_area = 4,
-	place_block = 5, 
+	place_block = 5,
+	win = 6,
+	loose = 7,
+	detonate_area = 8,
 };
-
+static void slot_to_win(AshCore* theCore, AshEntity& oldPLayer)
+{
+	if (!winCreated)
+	{
+		std::cout << "You win!!! Press enter";
+		winCreated = true;
+	}
+	while (true)
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) { theCore->getWindow().close(); }
+		break;
+	}
+}
+static void slot_to_denotate_area(AshCore* theCore, AshEntity& oldPLayer)
+{
+	generalCleanArea(*theCore);
+}
+static void slot_to_loose(AshCore* theCore, AshEntity& oldPLayer)
+{
+	if (!looseCreated)
+	{
+		std::cout << "You Loose!!! Press enter";
+		looseCreated = true;
+	}
+	while (true)
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) { theCore->getWindow().close(); }
+		break;
+	}
+}
 
 static void slot_to_detonate_player(AshCore* theCore, AshEntity& oldPLayer)
 {
@@ -88,10 +120,29 @@ static void slot_to_rotate_area(AshCore* theCore, AshEntity& player)
 	player = PlayerTwo;
 	player.setTexture(theCore->getResourceManager().getTexture("player.png"));
 }
+static void slot_to_remove_block(AshCore* theCore, AshEntity& player)
+{
+	if (lastLightBlock != nullptr)
+	{
+		std::string name = lastLightBlock->getName();
+		blockCords cords;
+		cords.x = (*lastLightBlock).getInt("world_x");
+		cords.y = (*lastLightBlock).getInt("world_y");
+		cords.z = (*lastLightBlock).getInt("world_z");
+
+		sf::Vector2f rot(cords.x, cords.y); rot = rotateCordsBySide(rot, true);
+		theCore->popEntity(name, int(rot.x) + int(rot.y) + cords.z);
+		if (actualAreaInfo[its(cords.x / chunkSize) + '_' + its(cords.y / chunkSize)][cords].type == Blocks::snow) { --snowCount; }
+		actualAreaInfo[its(cords.x / chunkSize) + '_' + its(cords.y / chunkSize)].erase(cords);
+
+		lastLightBlock = nullptr;
+	}
+}
 static void slot_to_place_block(AshCore* theCore, AshEntity& player)
 {
 	BlockInfo block;
-	block.type = Blocks::cobble_stone;
+	block.type = tookedBlock;
+	if (tookedBlock == Blocks::snow) { ++snowCount; }
 	if (lastLightBlock != nullptr)
 	{
 		blockCords& cords = block.cords;

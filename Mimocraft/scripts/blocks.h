@@ -10,4 +10,5 @@ static enum Blocks
 	water = 5,
 	glass = 6,
 	cobble_stone_grass = 7,
+	snow = 8,
 };

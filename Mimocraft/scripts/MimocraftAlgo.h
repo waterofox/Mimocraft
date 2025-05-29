@@ -61,18 +61,22 @@ static std::string chunkDir = "data/chunks/";
 
 static AshEntity* lastLightBlock = nullptr;
 static int sideOfLastLigthBlock = -1;
+static int tookedBlock = Blocks::grass;
 
 static std::vector<std::string> blocksTextures = {
 "00.png", "01.png","02.png","03.png", "04.png", "05.png",
-"06.png", "07.png"};
+"06.png", "07.png","08.png"};
 
+static float jump = 0;;
 static int actualSide = sides::South;
 static int oldSide = sides::South;
 static bool needRotation = false;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static int snowCount = 0;
+static bool winCreated = false;
+static bool looseCreated = false;
 
-
+/////////////////////////////
 
 static void saveChunk(const std::string& name)
 {
@@ -267,8 +271,8 @@ static void deployPlayer(ash::AshEntity& player, sf::Vector2f cordsToDraw)
 	cordsToDraw *= float((64 * 0.70));
 
 	player.setPosition(rotate(cordsToDraw, 45));
-	player.move(0, -16);
-	player.move(0, -(32.0 * 1.5) * player.getFloat("world_z"));
+	//player.move(0, -16);
+	player.move(0, -(32.) * player.getFloat("world_z"));
 	player.move(0, -16 * temp.x);
 	player.move(0, -16 * temp.y);
 }
